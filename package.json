@@ -1,0 +1,36 @@
+{
+  "name": "@showcomposer/broker",
+  "version": "0.0.1-dev.0",
+  "description": "communication core for ShowComposer",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "build": "tsc",
+    "build-watch": "tsc --watch",
+    "setup": "npm ci",
+    "lint": "tslint --project .",
+    "lintfix": "tslint --project . --fix",
+    "incDevVersion": "npm version prerelease"
+  },
+  "main": "./dist/sc-broker.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShowComposer/broker.git"
+  },
+  "keywords": [
+    "ShowComposer",
+    "Libary",
+    "Networking"
+  ],
+  "author": "Marvin Gaube/ShowComposer Team",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ShowComposer/broker/issues"
+  },
+  "homepage": "https://showcomposer.de",
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "tslint": "^5.12.0",
+    "typescript": "^3.1.1"
+  },
+  "dependencies": {}
+}
