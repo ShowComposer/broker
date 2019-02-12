@@ -9,9 +9,10 @@
     "setup": "npm ci",
     "lint": "tslint --project .",
     "lintfix": "tslint --project . --fix",
-    "incDevVersion": "npm version prerelease"
+    "incDevVersion": "npm version prerelease",
+    "debug": "NODE_ENV=debug node ./dist/broker.js"
   },
-  "main": "./dist/sc-broker.js",
+  "main": "./dist/broker.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ShowComposer/broker.git"
@@ -28,7 +29,7 @@
   },
   "homepage": "https://showcomposer.de",
   "devDependencies": {
-    "@types/node": "^10.12.18",
+    "@types/node": "^10.12.25",
     "tslint": "^5.12.0",
     "typescript": "^3.1.1"
   },
