@@ -21,7 +21,7 @@ class Client {
   private reqWait = 0;
   private reqArray = {};
   private inputReader: any;
-  private pingResponse: number;
+  private pingResponse: bigint;
   private pingSuccess: number;
   // Constructor run by every new connection
   constructor(socket: net.Socket) {
@@ -51,11 +51,12 @@ class Client {
   }
   // Periodically Ping
   public ping() {
-    const start = process.hrtime()[1];
+    const start = process.hrtime.bigint();
     this.send("PING", "", (c) => {
       if (c[1] === "PONG") {
-        this.pingResponse = (process.hrtime()[1] - start) / 1000;
+        this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
+        console.log("Ping: " + this.pingResponse + '\xB5s');
       }
     });
   }
