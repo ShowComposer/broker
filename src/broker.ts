@@ -56,7 +56,7 @@ class Client {
       if (c[1] === "PONG") {
         this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
-        console.log("Ping: " + this.pingResponse + '\xB5s');
+        console.log("Ping: " + this.pingResponse + "\xB5s");
       }
     });
   }
