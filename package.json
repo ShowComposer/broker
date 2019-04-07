@@ -10,7 +10,7 @@
     "lint": "tslint --project .",
     "lintfix": "tslint --project . --fix",
     "incDevVersion": "npm version prerelease",
-    "debug": "NODE_ENV=debug node ./dist/broker.js"
+    "debug": "NODE_ENV=debug nodemon ./dist/broker.js"
   },
   "main": "./dist/broker.js",
   "repository": {
