@@ -135,7 +135,6 @@ class Client {
           if (res) {
             this.sendRes(id, "SET_RES", ret);
           }
-          Logging.debug("SET_RES " + id + " " + ret);
           break;
         case "SUB":
           // Check if key is present
@@ -148,7 +147,7 @@ class Client {
           this.subscriptions.push(s.t);
           this.sendRes(id, "SUB_RES", s.id.toString());
           break;
-          case "UNSUB":
+        case "UNSUB":
           if (!m[2]) {
             Logging.warning("UNSUB " + id + " E NO_ID");
             return;
