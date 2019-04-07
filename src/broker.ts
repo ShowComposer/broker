@@ -123,8 +123,12 @@ class Client {
             console.log("SET "+id+" 2 NO_DATA");
             return;
           }
-          data.set(m[2], m[3]);
-          // ToDO: Send Response
+          // Execute Set command and return/log response.
+          const ret = data.set(m[2], m[3]);
+          if(res) {
+            this.sendRes(id, "SET_RES", ret);
+          }
+          console.log("SET "+id+" "+ret);
         break;
       }
     }

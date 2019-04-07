@@ -1,4 +1,5 @@
 const set = require('set-value');
+const PubSub = require('pubsub-js');
 
 export class SCData {
   private data = {};
@@ -10,6 +11,7 @@ export class SCData {
     switch(type) {
       case 'LIVE':
         set(this.data, key, value);
+        PubSub.publish(key, 'SET LIVE '+key+'='+value+' 0');
       break;
       case 'STATIC':
 
@@ -22,5 +24,6 @@ export class SCData {
       break;
     }
     console.log(JSON.stringify(this.data, null, 4));
+    return 0;
   }
 }
