@@ -74,8 +74,8 @@ class Client {
     if (m.length < 2) {
       return;
     }
-    const type = parseInt(m[0], 10);
-    if (isNaN(type)) {
+    const id = parseInt(m[0], 10);
+    if (isNaN(id)) {
       return;
     }
     if (!m[2]) {
@@ -84,13 +84,14 @@ class Client {
     // Determine if it's new req or response
     if (responseTypes.includes(m[1])) {
       // It's a response
-      // Check if id exists and handle
+      // Check if id exists and handle cb
       if (this.reqArray[m[0]]) {
         this.reqArray[m[0]](m);
         delete this.reqArray[m[0]];
       }
     }
     if (sendTypes.includes(m[1])) {
+      // it's a req
       // ToDo: Handle Requests
     }
     // Else: drop
