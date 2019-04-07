@@ -4,6 +4,7 @@ import set = require("set-value");
 export class SCData {
   private data = {};
   private static = {};
+  private subscribers = [];
   public set(type, cmd) {
     const p = cmd.split("=");
     const key = p[0];
@@ -30,10 +31,12 @@ export class SCData {
     return "0";
   }
   public sub(key, cb, t) {
+    const id = this.subscribers.length;
     const token = PubSub.subscribe(key, (m, d) => {
-      cb(m, d, t);
+      cb(m, d, id, t);
     });
-    return token;
+    this.subscribers[id] = token;
+    return {t: token, id: id};
   }
   public unsub(token) {
     PubSub.unsubscribe(token);

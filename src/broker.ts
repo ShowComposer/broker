@@ -138,13 +138,13 @@ class Client {
           case "SUB":
             // Check if key is present
             if (!m[2]) {
-              this.sendRes(id, "SET_RES", "1 NO_KEY");
-              console.log("SET " + id + " 1 NO_KEY");
+              console.log("SUB " + id + " 1 NO_KEY");
               return;
             }
             // this needed as t
-            var token=data.sub(m[2], this.subs, this);
-            this.subscriptions.push(token);
+            var s=data.sub(m[2], this.subs, this);
+            this.subscriptions.push(s.t);
+            this.sendRes(id, "SUB_RES", s.id.toString());
             break;
       }
     }
@@ -166,8 +166,8 @@ class Client {
     this.socket.write(id + " " + type + " " + payload + "\r\n");
   }
   // Subscriber for all changes
-  private subs(m, d, t) {
-    t.sendNoResRaw(d);
+  private subs(m, d, id, t) {
+    t.sendNoResRaw("SMSG "+id+" "+d);
   }
 }
 
