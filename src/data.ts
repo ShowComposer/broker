@@ -24,6 +24,6 @@ export class SCData {
       break;
     }
     console.log(JSON.stringify(this.data, null, 4));
-    return 0;
+    return "0";
   }
 }
