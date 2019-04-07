@@ -7,11 +7,13 @@ const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "
 const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
 const dataTypes = ["STATIC", "LIVE", "TICK", "LINK"];
 
-// import settings
 import * as net from "net";
 import * as readline from "readline";
 import * as uuid from "uuid/v4";
 import { SCData } from "./data";
+
+// Logging
+import { Logging } from "@hibas123/nodelogging";
 
 const data = new SCData();
 // Client class, handling incoming connections
@@ -53,7 +55,7 @@ class Client {
     this.socket.setNoDelay();
     // Handle closing
     socket.on("close", () => {
-      console.log("client disconnected");
+      Logging.log("Con. " + this.uuid + " closed");
       this.close();
     });
   }
@@ -64,7 +66,7 @@ class Client {
       if (c[1] === "PONG") {
         this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
-        console.log("Ping: " + this.pingResponse + "\xB5s");
+        Logging.debug("Ping: " + this.pingResponse + "\xB5s");
         data.set("LIVE", "system.connections." + this.uuid + ".latency=" + this.pingResponse);
         data.set("LIVE", "system.connections." + this.uuid + ".last_ping=" + this.pingSuccess);
       }
@@ -115,17 +117,17 @@ class Client {
           // m[2] is data types
           if (!dataTypes.includes(m[2])) {
             if (res) {
-              this.sendRes(id, "SET_RES", "1 INVALID_TYPE");
+              this.sendRes(id, "SET_RES", "E INVALID_TYPE");
             }
-            console.log("SET_RES " + id + " 1 INVALID_TYPE");
+            Logging.warning("SET_RES " + id + " E INVALID_TYPE");
             return;
           }
           // m[3] is necessary as it contains data
           if (!m[3]) {
             if (res) {
-              this.sendRes(id, "SET_RES", "2 NO_DATA");
+              this.sendRes(id, "SET_RES", "E NO_DATA");
             }
-            console.log("SET_RES " + id + " 2 NO_DATA");
+            Logging.warning("SET_RES " + id + " E NO_DATA");
             return;
           }
           // Execute Set command and return/log response.
@@ -133,12 +135,12 @@ class Client {
           if (res) {
             this.sendRes(id, "SET_RES", ret);
           }
-          console.log("SET_RES " + id + " " + ret);
+          Logging.debug("SET_RES " + id + " " + ret);
           break;
         case "SUB":
           // Check if key is present
           if (!m[2]) {
-            console.log("SUB_RES " + id + " E NO_KEY");
+            Logging.warning("SUB_RES " + id + " E NO_KEY");
             return;
           }
           // this needed as t
@@ -148,7 +150,7 @@ class Client {
           break;
           case "UNSUB":
           if (!m[2]) {
-            console.log("UNSUB " + id + " E NO_ID");
+            Logging.warning("UNSUB " + id + " E NO_ID");
             return;
           }
           if (data.unsubId(m[2]) === true) {
@@ -188,5 +190,5 @@ server.on("connection", (s) => {
   const c = new Client(s);
 });
 server.listen(config.port, () => {
-  console.log("Listening on port " + config.port);
+  Logging.log("Listening on port " + config.port);
 });
