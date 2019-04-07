@@ -5,7 +5,7 @@ const subscriber = {};
 
 const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP"];
 const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
-const dataTypes = ['STATIC', 'LIVE', 'TICK', 'LINK'];
+const dataTypes = ["STATIC", "LIVE", "TICK", "LINK"];
 
 // import settings
 import * as net from "net";
@@ -46,8 +46,8 @@ class Client {
     subscriber[this.uuid] = this;
 
     // Initialize obj in data
-    data.set('LIVE','system.connections.'+this.uuid+'.state=UP');
-    data.set('LIVE','system.connections.'+this.uuid+'.time_established='+Date.now());
+    data.set("LIVE", "system.connections." + this.uuid + ".state=UP");
+    data.set("LIVE", "system.connections." + this.uuid + ".time_established=" + Date.now());
 
     this.socket.setNoDelay();
     // Handle closing
@@ -64,8 +64,8 @@ class Client {
         this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
         console.log("Ping: " + this.pingResponse + "\xB5s");
-        data.set('LIVE','system.connections.'+this.uuid+'.latency='+this.pingResponse);
-        data.set('LIVE','system.connections.'+this.uuid+'.last_ping='+this.pingSuccess);
+        data.set("LIVE", "system.connections." + this.uuid + ".latency=" + this.pingResponse);
+        data.set("LIVE", "system.connections." + this.uuid + ".last_ping=" + this.pingSuccess);
       }
     });
   }
@@ -76,8 +76,8 @@ class Client {
     if (!this.socket.destroyed) {
       this.socket.destroy();
     }
-    data.set('LIVE','system.connections.'+this.uuid+'.state=CLOSED');
-    data.set('LIVE','system.connections.'+this.uuid+'.time_closed='+Date.now());
+    data.set("LIVE", "system.connections." + this.uuid + ".state=CLOSED");
+    data.set("LIVE", "system.connections." + this.uuid + ".time_closed=" + Date.now());
   }
   // Handle input
   public handleLine(c) {
@@ -103,33 +103,33 @@ class Client {
     }
     if (sendTypes.includes(m[1])) {
       // it's a req
-      switch(m[1]) {
-        case 'SET':
-          let res=false;
-          if(m[4]==='1') {res = true;}
+      switch (m[1]) {
+        case "SET":
+          let res = false;
+          if (m[4] === "1") {res = true; }
           // m[2] is data types
-          if(!dataTypes.includes(m[2])) {
-            if(res) {
+          if (!dataTypes.includes(m[2])) {
+            if (res) {
               this.sendRes(id, "SET_RES", "1 INVALID_TYPE");
             }
-            console.log("SET "+id+" 1 INVALID_TYPE");
+            console.log("SET " + id + " 1 INVALID_TYPE");
             return;
           }
           // m[3] is necessary as it contains data
-          if(!m[3]) {
-            if(res) {
+          if (!m[3]) {
+            if (res) {
               this.sendRes(id, "SET_RES", "2 NO_DATA");
             }
-            console.log("SET "+id+" 2 NO_DATA");
+            console.log("SET " + id + " 2 NO_DATA");
             return;
           }
           // Execute Set command and return/log response.
           const ret = data.set(m[2], m[3]);
-          if(res) {
+          if (res) {
             this.sendRes(id, "SET_RES", ret);
           }
-          console.log("SET "+id+" "+ret);
-        break;
+          console.log("SET " + id + " " + ret);
+          break;
       }
     }
     // Else: drop
