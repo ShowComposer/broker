@@ -138,13 +138,24 @@ class Client {
         case "SUB":
           // Check if key is present
           if (!m[2]) {
-            console.log("SUB " + id + " 1 NO_KEY");
+            console.log("SUB_RES " + id + " E NO_KEY");
             return;
           }
           // this needed as t
           const s = data.sub(m[2], this.subs, this);
           this.subscriptions.push(s.t);
           this.sendRes(id, "SUB_RES", s.id.toString());
+          break;
+          case "UNSUB":
+          if (!m[2]) {
+            console.log("UNSUB " + id + " E NO_ID");
+            return;
+          }
+          if(data.unsubId(m[2])===true) {
+            this.sendRes(id, "UNSUB_RES", "0 OK");
+          } else {
+            this.sendRes(id, "UNSUB_RES", "1 ERR");
+          }
           break;
       }
     }

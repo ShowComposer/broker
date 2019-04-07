@@ -13,11 +13,11 @@ export class SCData {
     switch (type) {
       case "LIVE":
         set(this.data, key, value);
-        PubSub.publish(key, "SET LIVE " + key + "=" + value + " 0");
+        PubSub.publish(key, "SET LIVE " + key + "=" + value);
         break;
       case "STATIC":
         set(this.data, key, value);
-        PubSub.publish(key, "SET STATIC " + key + "=" + value + " 0");
+        PubSub.publish(key, "SET STATIC " + key + "=" + value);
         set(this.static, key, value);
         // ToDo: Save changes
         break;
@@ -36,9 +36,17 @@ export class SCData {
       cb(m, d, id, t);
     });
     this.subscribers[id] = token;
-    return {t: token, id};
+    return { t: token, id };
   }
   public unsub(token) {
     PubSub.unsubscribe(token);
+  }
+  public unsubId(id) {
+    if (this.subscribers[id]) {
+      PubSub.unsubscribe(this.subscribers[id]);
+      this.subscribers[id] = false;
+      return true;
+    }
+    return false;
   }
 }
