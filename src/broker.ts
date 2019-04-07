@@ -142,7 +142,7 @@ class Client {
             return;
           }
           // this needed as t
-          var s = data.sub(m[2], this.subs, this);
+          const s = data.sub(m[2], this.subs, this);
           this.subscriptions.push(s.t);
           this.sendRes(id, "SUB_RES", s.id.toString());
           break;

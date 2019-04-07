@@ -36,7 +36,7 @@ export class SCData {
       cb(m, d, id, t);
     });
     this.subscribers[id] = token;
-    return {t: token, id: id};
+    return {t: token, id};
   }
   public unsub(token) {
     PubSub.unsubscribe(token);
