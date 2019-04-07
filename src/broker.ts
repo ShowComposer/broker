@@ -5,12 +5,15 @@ const subscriber = {};
 
 const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP"];
 const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
+const dataTypes = ['STATIC', 'LIVE', 'TICK', 'LINK'];
 
 // import settings
 import * as net from "net";
 import * as readline from "readline";
 import * as uuid from "uuid/v4";
+import {SCData} from "./data";
 
+const data = new SCData();
 // Client class, handling incoming connections
 class Client {
   private socket: net.Socket;
@@ -22,6 +25,7 @@ class Client {
   private inputReader: any;
   private pingResponse: bigint;
   private pingSuccess: number;
+
   // Constructor run by every new connection
   constructor(socket: net.Socket) {
     this.uuid = uuid();
@@ -93,8 +97,25 @@ class Client {
       // it's a req
       switch(m[1]) {
         case 'SET':
-          // ToDo: Set data
-          // ToDo: Fire Pub
+          let res=false;
+          if(m[4]==='1') {res = true;}
+          // m[2] is data types
+          if(!dataTypes.includes(m[2])) {
+            if(res) {
+              this.sendRes(id, "SET_RES", "1 INVALID_TYPE");
+            }
+            console.log("SET "+id+" 1 INVALID_TYPE");
+            return;
+          }
+          // m[3] is necessary as it contains data
+          if(!m[3]) {
+            if(res) {
+              this.sendRes(id, "SET_RES", "2 NO_DATA");
+            }
+            console.log("SET "+id+" 2 NO_DATA");
+            return;
+          }
+          data.set(m[2], m[3]);
           // ToDO: Send Response
         break;
       }
