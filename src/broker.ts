@@ -45,6 +45,10 @@ class Client {
     // Add this receiver to subscibers
     subscriber[this.uuid] = this;
 
+    // Initialize obj in data
+    data.set('LIVE','system.connections.'+this.uuid+'.state=UP');
+    data.set('LIVE','system.connections.'+this.uuid+'.time_established='+Date.now());
+
     this.socket.setNoDelay();
     // Handle closing
     socket.on("close", () => {
@@ -60,6 +64,8 @@ class Client {
         this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
         console.log("Ping: " + this.pingResponse + "\xB5s");
+        data.set('LIVE','system.connections.'+this.uuid+'.latency='+this.pingResponse);
+        data.set('LIVE','system.connections.'+this.uuid+'.last_ping='+this.pingSuccess);
       }
     });
   }
@@ -70,6 +76,8 @@ class Client {
     if (!this.socket.destroyed) {
       this.socket.destroy();
     }
+    data.set('LIVE','system.connections.'+this.uuid+'.state=CLOSED');
+    data.set('LIVE','system.connections.'+this.uuid+'.time_closed='+Date.now());
   }
   // Handle input
   public handleLine(c) {
