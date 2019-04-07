@@ -3,7 +3,7 @@
 const config = { port: 6789 };
 const subscriber = {};
 
-const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP"];
+const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP", "SMSG"];
 const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
 const dataTypes = ["STATIC", "LIVE", "TICK", "LINK"];
 
@@ -11,7 +11,7 @@ const dataTypes = ["STATIC", "LIVE", "TICK", "LINK"];
 import * as net from "net";
 import * as readline from "readline";
 import * as uuid from "uuid/v4";
-import {SCData} from "./data";
+import { SCData } from "./data";
 
 const data = new SCData();
 // Client class, handling incoming connections
@@ -111,13 +111,13 @@ class Client {
       switch (m[1]) {
         case "SET":
           let res = false;
-          if (m[4] === "1") {res = true; }
+          if (m[4] === "1") { res = true; }
           // m[2] is data types
           if (!dataTypes.includes(m[2])) {
             if (res) {
               this.sendRes(id, "SET_RES", "1 INVALID_TYPE");
             }
-            console.log("SET " + id + " 1 INVALID_TYPE");
+            console.log("SET_RES " + id + " 1 INVALID_TYPE");
             return;
           }
           // m[3] is necessary as it contains data
@@ -125,7 +125,7 @@ class Client {
             if (res) {
               this.sendRes(id, "SET_RES", "2 NO_DATA");
             }
-            console.log("SET " + id + " 2 NO_DATA");
+            console.log("SET_RES " + id + " 2 NO_DATA");
             return;
           }
           // Execute Set command and return/log response.
@@ -133,19 +133,19 @@ class Client {
           if (res) {
             this.sendRes(id, "SET_RES", ret);
           }
-          console.log("SET " + id + " " + ret);
+          console.log("SET_RES " + id + " " + ret);
           break;
-          case "SUB":
-            // Check if key is present
-            if (!m[2]) {
-              console.log("SUB " + id + " 1 NO_KEY");
-              return;
-            }
-            // this needed as t
-            var s=data.sub(m[2], this.subs, this);
-            this.subscriptions.push(s.t);
-            this.sendRes(id, "SUB_RES", s.id.toString());
-            break;
+        case "SUB":
+          // Check if key is present
+          if (!m[2]) {
+            console.log("SUB " + id + " 1 NO_KEY");
+            return;
+          }
+          // this needed as t
+          var s = data.sub(m[2], this.subs, this);
+          this.subscriptions.push(s.t);
+          this.sendRes(id, "SUB_RES", s.id.toString());
+          break;
       }
     }
     // Else: drop
@@ -167,7 +167,7 @@ class Client {
   }
   // Subscriber for all changes
   private subs(m, d, id, t) {
-    t.sendNoResRaw("SMSG "+id+" "+d);
+    t.sendNoResRaw("SMSG " + id + " " + d);
   }
 }
 
