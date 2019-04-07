@@ -1,7 +1,6 @@
 // SC broker
 // Init global variables
 const config = { port: 6789 };
-const data = {};
 const subscriber = {};
 
 const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP"];
@@ -92,7 +91,13 @@ class Client {
     }
     if (sendTypes.includes(m[1])) {
       // it's a req
-      // ToDo: Handle Requests
+      switch(m[1]) {
+        case 'SET':
+          // ToDo: Set data
+          // ToDo: Fire Pub
+          // ToDO: Send Response
+        break;
+      }
     }
     // Else: drop
   }
