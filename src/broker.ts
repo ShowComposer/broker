@@ -25,6 +25,7 @@ class Client {
   private inputReader: any;
   private pingResponse: bigint;
   private pingSuccess: number;
+  private subscriptions = [];
 
   // Constructor run by every new connection
   constructor(socket: net.Socket) {
@@ -71,6 +72,10 @@ class Client {
   }
   // Close everything
   public close() {
+    // unsubscribe from all subscriptions
+    this.subscriptions.forEach((s) => {
+      data.unsub(s);
+    });
     delete subscriber[this.uuid];
     clearInterval(this.pingInt);
     if (!this.socket.destroyed) {
@@ -130,6 +135,17 @@ class Client {
           }
           console.log("SET " + id + " " + ret);
           break;
+          case "SUB":
+            // Check if key is present
+            if (!m[2]) {
+              this.sendRes(id, "SET_RES", "1 NO_KEY");
+              console.log("SET " + id + " 1 NO_KEY");
+              return;
+            }
+            // this needed as t
+            var token=data.sub(m[2], this.subs, this);
+            this.subscriptions.push(token);
+            break;
       }
     }
     // Else: drop
@@ -140,9 +156,18 @@ class Client {
     this.socket.write(this.reqId + " " + type + " " + payload + "\r\n");
     this.reqArray[this.reqId] = cb;
   }
+  // Build pkg
+  public sendNoResRaw(payload = "") {
+    this.reqId++;
+    this.socket.write(this.reqId + " " + payload + "\r\n");
+  }
   // Build pkg res
   public sendRes(id = 0, type = "PONG", payload = "") {
     this.socket.write(id + " " + type + " " + payload + "\r\n");
+  }
+  // Subscriber for all changes
+  private subs(m, d, t) {
+    t.sendNoResRaw(d);
   }
 }
 
