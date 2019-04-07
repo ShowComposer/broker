@@ -151,7 +151,7 @@ class Client {
             console.log("UNSUB " + id + " E NO_ID");
             return;
           }
-          if(data.unsubId(m[2])===true) {
+          if (data.unsubId(m[2]) === true) {
             this.sendRes(id, "UNSUB_RES", "0 OK");
           } else {
             this.sendRes(id, "UNSUB_RES", "1 ERR");
