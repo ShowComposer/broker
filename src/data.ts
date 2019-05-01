@@ -40,6 +40,7 @@ export class SCData {
     const token = PubSub.subscribe(key, (m, d) => {
       cb(m, d, id, t);
     });
+    Logging.log("New subscription to "+key);
     this.subscribers[id] = token;
     return { t: token, id };
   }
