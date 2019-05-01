@@ -40,7 +40,7 @@ export class SCData {
     const token = PubSub.subscribe(key, (m, d) => {
       cb(m, d, id, t);
     });
-    Logging.log("New subscription to "+key);
+    Logging.log("New subscription to " + key);
     this.subscribers[id] = token;
     return { t: token, id };
   }
@@ -59,17 +59,19 @@ export class SCData {
     const d = get(this.data, key);
     const dump = [];
     Logging.debug("DUMP " + key);
-    const iterate = (obj, last= key) => {
-      Object.keys(obj).forEach((k) => {
-        if (typeof obj[k] === "object") {
-          const nlast = last + "." + k;
-          iterate(obj[k], nlast);
-        } else {
-          dump.push(last + "." + k + "=" + obj[k]);
-        }
-      });
-    };
-    iterate(d);
+    if (d) {
+      const iterate = (obj, last = key) => {
+        Object.keys(obj).forEach((k) => {
+          if (typeof obj[k] === "object") {
+            const nlast = last + "." + k;
+            iterate(obj[k], nlast);
+          } else {
+            dump.push(last + "." + k + "=" + obj[k]);
+          }
+        });
+      };
+      iterate(d);
+    }
     return dump;
   }
 }
