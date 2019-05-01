@@ -147,6 +147,16 @@ class Client {
           this.subscriptions.push(s.t);
           this.sendRes(id, "SUB_RES", s.id.toString());
           break;
+        case "DUMP":
+          // Check if key is present
+          if (!m[2]) {
+            Logging.warning("DUMP_RES " + id + " E NO_KEY");
+            return;
+          }
+          const d = data.dump(m[2]);
+          d.map((dumpSet) => {
+            this.sendNoResRaw("SET " + dumpSet);
+          });
         case "UNSUB":
           if (!m[2]) {
             Logging.warning("UNSUB " + id + " E NO_ID");

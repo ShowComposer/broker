@@ -1,3 +1,4 @@
+import get = require("get-value");
 import PubSub = require("pubsub-js");
 import set = require("set-value");
 
@@ -31,7 +32,7 @@ export class SCData {
 
         break;
     }
-    Logging.debug("SET "+key+" to "+value);
+    Logging.debug("SET " + key + " to " + value);
     return "0";
   }
   public sub(key, cb, t) {
@@ -52,5 +53,22 @@ export class SCData {
       return true;
     }
     return false;
+  }
+  public dump(key) {
+    const d = get(this.data, key);
+    const dump = [];
+    Logging.debug("DUMP " + key);
+    const iterate = (obj, last= key) => {
+      Object.keys(obj).forEach((k) => {
+        if (typeof obj[k] === "object") {
+          const nlast = last + "." + k;
+          iterate(obj[k], nlast);
+        } else {
+          dump.push(last + "." + k + "=" + obj[k]);
+        }
+      });
+    };
+    iterate(d);
+    return dump;
   }
 }
