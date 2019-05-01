@@ -1,6 +1,9 @@
 import PubSub = require("pubsub-js");
 import set = require("set-value");
 
+// Logging
+import { Logging } from "@hibas123/nodelogging";
+
 export class SCData {
   private data = {};
   private static = {};
@@ -28,6 +31,7 @@ export class SCData {
 
         break;
     }
+    Logging.debug("SET "+key+" to "+value);
     return "0";
   }
   public sub(key, cb, t) {
