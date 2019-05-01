@@ -86,6 +86,19 @@ class Client {
     data.set("LIVE", "system.connections." + this.uuid + ".state=CLOSED");
     data.set("LIVE", "system.connections." + this.uuid + ".time_closed=" + Date.now());
   }
+  public destroy() {
+    // unsubscribe from all subscriptions
+    this.subscriptions.forEach((s) => {
+      data.unsub(s);
+    });
+    delete subscriber[this.uuid];
+    clearInterval(this.pingInt);
+    if (!this.socket.destroyed) {
+      this.socket.destroy();
+    }
+    data.set("LIVE", "system.connections." + this.uuid + ".state=DESTROYED");
+    data.set("LIVE", "system.connections." + this.uuid + ".time_closed=" + Date.now());
+  }
   // Handle input
   public handleLine(c) {
     const m = c.toString("utf8").split(" ");
@@ -174,18 +187,33 @@ class Client {
   }
   // Build pkg
   public send(type = "PING", payload = "", cb = (res: any) => undefined) {
-    this.reqId++;
-    this.socket.write(this.reqId + " " + type + " " + payload + "\r\n");
-    this.reqArray[this.reqId] = cb;
+    try {
+      this.reqId++;
+      this.socket.write(this.reqId + " " + type + " " + payload + "\r\n");
+      this.reqArray[this.reqId] = cb;
+    } catch (e) {
+      Logging.error(e);
+      this.destroy();
+    }
   }
   // Build pkg
   public sendNoResRaw(payload = "") {
-    this.reqId++;
-    this.socket.write(this.reqId + " " + payload + "\r\n");
+    try {
+      this.reqId++;
+      this.socket.write(this.reqId + " " + payload + "\r\n");
+    } catch (e) {
+      Logging.error(e);
+    }
+    this.destroy();
   }
   // Build pkg res
   public sendRes(id = 0, type = "PONG", payload = "") {
-    this.socket.write(id + " " + type + " " + payload + "\r\n");
+    try {
+      this.socket.write(id + " " + type + " " + payload + "\r\n");
+    } catch (e) {
+      Logging.error(e);
+      this.destroy();
+    }
   }
   // Subscriber for all changes
   private subs(m, d, id, t) {
