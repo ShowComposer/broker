@@ -155,7 +155,7 @@ class Client {
           }
           const d = data.dump(m[2]);
           d.map((dumpSet) => {
-            this.sendNoResRaw("SET " + dumpSet);
+            this.sendNoResRaw("SET LIVE " + dumpSet);
           });
         case "UNSUB":
           if (!m[2]) {
