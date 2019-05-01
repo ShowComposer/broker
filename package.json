@@ -23,7 +23,7 @@
     "Networking"
   ],
   "author": "Marvin Gaube/ShowComposer Team",
-  "license": "LGPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ShowComposer/broker/issues"
   },
