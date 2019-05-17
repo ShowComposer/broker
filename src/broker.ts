@@ -56,7 +56,6 @@ class Client {
     // Handle closing
     socket.on("close", () => {
       Logging.log("Con. " + this.uuid + " closed");
-      this.close();
     });
   }
   // Periodically Ping
@@ -203,8 +202,8 @@ class Client {
       this.socket.write(this.reqId + " " + payload + "\r\n");
     } catch (e) {
       Logging.error(e);
+      this.destroy();
     }
-    this.destroy();
   }
   // Build pkg res
   public sendRes(id = 0, type = "PONG", payload = "") {
