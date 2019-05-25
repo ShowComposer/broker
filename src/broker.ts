@@ -57,6 +57,10 @@ class Client {
     socket.on("close", () => {
       Logging.log("Con. " + this.uuid + " closed");
     });
+    socket.on("error", (err) => {
+      Logging.error(err);
+      this.destroy();
+    });
   }
   // Periodically Ping
   public ping() {
