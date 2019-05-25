@@ -52,6 +52,7 @@ class Client {
     data.set("LIVE", "system.connections." + this.uuid + ".state=UP");
     data.set("LIVE", "system.connections." + this.uuid + ".time_established=" + Date.now());
 
+    this.socket.setKeepAlive(true);
     this.socket.setNoDelay();
     // Handle closing
     socket.on("close", () => {
