@@ -1,14 +1,32 @@
 import get = require("get-value");
 import PubSub = require("pubsub-js");
 import set = require("set-value");
-
+import os = require("os");
+import json = require('big-json');
+import fs = require('fs');
 // Logging
 import { Logging } from "@hibas123/nodelogging";
 
 export class SCData {
+  private file = "";
+  private staticLastChange: number;
+  private staticChanged = false;
+  private lastSave: number;
   private data = {};
   private static = {};
   private subscribers = [];
+  constructor() {
+    this.file = os.homedir() + "/SCProject.json";
+    this.staticLastChange = Date.now();
+    this.lastSave = Date.now();
+    setInterval(() => {
+      if (this.staticChanged) {
+        if (Date.now() - this.lastSave > 10000) {
+          this.save();
+        }
+      }
+    }, 5000);
+  }
   public set(type, cmd) {
     const p = cmd.split("=");
     const key = p[0];
@@ -23,7 +41,12 @@ export class SCData {
         set(this.data, key, value);
         PubSub.publish(key, "SET STATIC " + key + "=" + value);
         set(this.static, key, value);
-        // ToDo: Save changes
+        // Save file if necessary and set flags
+        this.staticChanged = true;
+        if ((Date.now() - this.staticLastChange) > 250) {
+          this.save();
+        }
+        this.staticLastChange = Date.now();
         break;
       case "LINK":
         // ToDo
@@ -73,5 +96,29 @@ export class SCData {
       iterate(d);
     }
     return dump;
+  }
+  public save() {
+    Logging.log("Saving project into " + this.file);
+    const wstream = fs.createWriteStream(this.file);
+    const stringifyStream = json.createStringifyStream({
+      body: this.static
+    });
+    stringifyStream.pipe(wstream);
+    stringifyStream.on('end', () => {
+      wstream.end();
+      this.lastSave = Date.now();
+      this.staticChanged = false;
+    });
+    wstream.on('finish', ()=>{
+      fs.appendFile(this.file, os.EOL, 'utf8', (err) => {
+        if (err) {
+          Logging.error(err);
+        }
+      });
+    });
+    wstream.on('error', (err) => {
+      Logging.error("Error Saving project: " + err);
+    });
+
   }
 }
