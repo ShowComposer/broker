@@ -56,6 +56,7 @@ class Client {
     // Handle closing
     socket.on("close", () => {
       Logging.log("Con. " + this.uuid + " closed");
+      this.close();
     });
     socket.on("error", (err) => {
       Logging.error(err);
