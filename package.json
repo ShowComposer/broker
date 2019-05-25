@@ -37,6 +37,7 @@
   "dependencies": {
     "@hibas123/nodelogging": "^2.0.4",
     "big-json": "^2.0.2",
+    "deep-for-each": "^3.0.0",
     "get-value": "^3.0.1",
     "pubsub-js": "^1.7.0",
     "set-value": "^3.0.0",

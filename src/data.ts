@@ -1,14 +1,16 @@
-import get = require("get-value");
-import PubSub = require("pubsub-js");
-import set = require("set-value");
-import os = require("os");
-import json = require('big-json');
-import fs = require('fs');
 // Logging
 import { Logging } from "@hibas123/nodelogging";
+import json = require("big-json");
+import deepForEach = require("deep-for-each");
+import fs = require("fs");
+import get = require("get-value");
+import os = require("os");
+import PubSub = require("pubsub-js");
+import set = require("set-value");
 
 export class SCData {
   private file = "";
+  private fileLoaded = false;
   private staticLastChange: number;
   private staticChanged = false;
   private lastSave: number;
@@ -17,6 +19,7 @@ export class SCData {
   private subscribers = [];
   constructor() {
     this.file = os.homedir() + "/SCProject.json";
+    this.load();
     this.staticLastChange = Date.now();
     this.lastSave = Date.now();
     setInterval(() => {
@@ -98,27 +101,47 @@ export class SCData {
     return dump;
   }
   public save() {
-    Logging.log("Saving project into " + this.file);
-    const wstream = fs.createWriteStream(this.file);
-    const stringifyStream = json.createStringifyStream({
-      body: this.static
-    });
-    stringifyStream.pipe(wstream);
-    stringifyStream.on('end', () => {
-      wstream.end();
-      this.lastSave = Date.now();
-      this.staticChanged = false;
-    });
-    wstream.on('finish', ()=>{
-      fs.appendFile(this.file, os.EOL, 'utf8', (err) => {
-        if (err) {
-          Logging.error(err);
-        }
+    if (this.fileLoaded) {
+      Logging.log("Saving project into " + this.file);
+      const wstream = fs.createWriteStream(this.file);
+      const stringifyStream = json.createStringifyStream({
+        body: this.static,
       });
-    });
-    wstream.on('error', (err) => {
-      Logging.error("Error Saving project: " + err);
+      stringifyStream.pipe(wstream);
+      stringifyStream.on("end", () => {
+        wstream.end();
+        this.lastSave = Date.now();
+        this.staticChanged = false;
+      });
+      wstream.on("finish", () => {
+        fs.appendFile(this.file, os.EOL, "utf8", (err) => {
+          if (err) {
+            Logging.error(err);
+          }
+        });
+      });
+      wstream.on("error", (err) => {
+        Logging.error("Error Saving project: " + err);
+      });
+    } else {
+      Logging.error("Cannot save to unloaded file!");
+    }
+  }
+  public load() {
+    Logging.log("Loading project from " + this.file);
+
+    const readStream = fs.createReadStream(this.file);
+    const parseStream = json.createParseStream();
+    parseStream.on("data", (pojo) => {
+      deepForEach(pojo, (v, k, s, p) => {
+        if (typeof v !== "object") {
+            this.set("STATIC", p + "=" + v);
+        }
+
+      });
+      this.fileLoaded = true;
     });
 
+    readStream.pipe(parseStream);
   }
 }
