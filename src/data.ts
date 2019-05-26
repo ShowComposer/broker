@@ -4,7 +4,7 @@ import json = require("big-json");
 import deepForEach = require("deep-for-each");
 import fs = require("fs");
 import get = require("get-value");
-import merge = require('merge-deep');
+import merge = require("merge-deep");
 import os = require("os");
 import PubSub = require("pubsub-js");
 import set = require("set-value");
@@ -69,7 +69,7 @@ export class SCData {
     const assObject = {};
     // ToDo: Encode and unstringify
     // Prepare object with nested key to merge at root level
-    let deepAssObject = {};
+    const deepAssObject = {};
     set(deepAssObject, key, assObject);
     // Switch between different assign-types
     switch (type) {
