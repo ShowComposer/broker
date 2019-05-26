@@ -62,7 +62,7 @@ export class SCData {
     Logging.debug("SET " + key + " to " + value);
     return "0";
   }
-  public assign(type, key, value= "e30=") {
+  public assign(type, key, value = "e30=") {
     // Build POJO from encoded string
     const assObject = this.base64toPOJO(value);
     // Prepare object with nested key to merge at root level
@@ -148,21 +148,28 @@ export class SCData {
     }
   }
   public load() {
-    Logging.log("Loading project from " + this.file);
+    if (fs.existsSync(this.file)) {
+      Logging.log("Loading project from " + this.file);
 
-    const readStream = fs.createReadStream(this.file);
-    const parseStream = json.createParseStream();
-    parseStream.on("data", (pojo) => {
-      deepForEach(pojo, (v, k, s, p) => {
-        if (typeof v !== "object") {
+      const readStream = fs.createReadStream(this.file);
+      const parseStream = json.createParseStream();
+      parseStream.on("data", (pojo) => {
+        deepForEach(pojo, (v, k, s, p) => {
+          if (typeof v !== "object") {
             this.set("STATIC", p + "=" + v);
-        }
+          }
 
+        });
+        this.fileLoaded = true;
       });
-      this.fileLoaded = true;
-    });
 
-    readStream.pipe(parseStream);
+      readStream.pipe(parseStream);
+
+    } else {
+      this.fileLoaded = true;
+      Logging.log("No File, start project with file " + this.file);
+    }
+
   }
   private base64toPOJO(encoded) {
     const buff = Buffer.from(encoded, "base64");
