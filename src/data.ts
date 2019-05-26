@@ -4,6 +4,7 @@ import json = require("big-json");
 import deepForEach = require("deep-for-each");
 import fs = require("fs");
 import get = require("get-value");
+import merge = require('merge-deep');
 import os = require("os");
 import PubSub = require("pubsub-js");
 import set = require("set-value");
@@ -59,6 +60,42 @@ export class SCData {
         break;
     }
     Logging.debug("SET " + key + " to " + value);
+    return "0";
+  }
+  public assign(type, cmd) {
+    const p = cmd.split("=");
+    const key = p[0];
+    const value = p[1] || {};
+    const assObject = {};
+    // ToDo: Encode and unstringify
+    // Prepare object with nested key to merge at root level
+    let deepAssObject = {};
+    set(deepAssObject, key, assObject);
+    // Switch between different assign-types
+    switch (type) {
+      case "LIVE":
+        merge(this.data, deepAssObject);
+        PubSub.publish(key, "ASSIGN LIVE " + key + "=" + value);
+        break;
+      case "STATIC":
+        merge(this.data, deepAssObject);
+        PubSub.publish(key, "ASSIGN STATIC " + key + "=" + value);
+        merge(this.static, deepAssObject);
+        // Save file if necessary and set flags
+        this.staticChanged = true;
+        if ((Date.now() - this.staticLastChange) > 250) {
+          this.save();
+        }
+        this.staticLastChange = Date.now();
+        break;
+      case "LINK":
+        // ToDo
+        break;
+      case "TICK":
+
+        break;
+    }
+    Logging.debug("ASSIGN " + assObject + " to " + key);
     return "0";
   }
   public sub(key, cb, t) {
