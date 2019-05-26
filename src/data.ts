@@ -72,11 +72,11 @@ export class SCData {
     switch (type) {
       case "LIVE":
         this.data = merge(this.data, deepAssObject);
-        PubSub.publish(key, "ASSIGN LIVE " + key + "=" + value);
+        PubSub.publish(key, "ASSIGN LIVE " + key + " " + value);
         break;
       case "STATIC":
         this.data = merge(this.data, deepAssObject);
-        PubSub.publish(key, "ASSIGN STATIC " + key + "=" + value);
+        PubSub.publish(key, "ASSIGN STATIC " + key + " " + value);
         this.static = merge(this.static, deepAssObject);
         // Save file if necessary and set flags
         this.staticChanged = true;
