@@ -71,13 +71,13 @@ export class SCData {
     // Switch between different assign-types
     switch (type) {
       case "LIVE":
-        merge(this.data, deepAssObject);
+        this.data = merge(this.data, deepAssObject);
         PubSub.publish(key, "ASSIGN LIVE " + key + "=" + value);
         break;
       case "STATIC":
-        merge(this.data, deepAssObject);
+        this.data = merge(this.data, deepAssObject);
         PubSub.publish(key, "ASSIGN STATIC " + key + "=" + value);
-        merge(this.static, deepAssObject);
+        this.static = merge(this.static, deepAssObject);
         // Save file if necessary and set flags
         this.staticChanged = true;
         if ((Date.now() - this.staticLastChange) > 250) {
@@ -92,7 +92,7 @@ export class SCData {
 
         break;
     }
-    Logging.debug("ASSIGN " + assObject + " to " + key);
+    Logging.debug("ASSIGN " + JSON.stringify(assObject) + " to " + key);
     return "0";
   }
   public sub(key, cb, t) {
@@ -179,7 +179,7 @@ export class SCData {
     readStream.pipe(parseStream);
   }
   private base64toPOJO(encoded) {
-    const buff = new Buffer(encoded, "base64");
+    const buff = Buffer.from(encoded, "base64");
     const text = buff.toString("ascii");
     return JSON.parse(text);
   }
