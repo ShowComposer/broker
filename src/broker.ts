@@ -233,4 +233,5 @@ server.on("connection", (s) => {
 });
 server.listen(config.port, () => {
   Logging.log("Listening on port " + config.port);
+  process.send({status: "listening"});
 });
