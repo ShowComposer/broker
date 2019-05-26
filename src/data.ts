@@ -62,12 +62,9 @@ export class SCData {
     Logging.debug("SET " + key + " to " + value);
     return "0";
   }
-  public assign(type, cmd) {
-    const p = cmd.split("=");
-    const key = p[0];
-    const value = p[1] || {};
-    const assObject = {};
-    // ToDo: Encode and unstringify
+  public assign(type, key, value= "e30=") {
+    // Build POJO from encoded string
+    const assObject = this.base64toPOJO(value);
     // Prepare object with nested key to merge at root level
     const deepAssObject = {};
     set(deepAssObject, key, assObject);
@@ -180,5 +177,10 @@ export class SCData {
     });
 
     readStream.pipe(parseStream);
+  }
+  private base64toPOJO(encoded) {
+    const buff = new Buffer(encoded, "base64");
+    const text = buff.toString("ascii");
+    return JSON.parse(text);
   }
 }

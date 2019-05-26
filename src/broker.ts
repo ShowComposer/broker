@@ -156,7 +156,7 @@ class Client {
           }
           break;
         case "ASSIGN":
-          if (m[4] === "1") { res = true; }
+          if (m[5] === "1") { res = true; }
           // m[2] is data types
           if (!dataTypes.includes(m[2])) {
             if (res) {
@@ -165,16 +165,24 @@ class Client {
             Logging.warning("ASSIGN_RES " + id + " E INVALID_TYPE");
             return;
           }
-          // m[3] is necessary as it contains data
+          // m[3] is necessary as it contains key
           if (!m[3]) {
             if (res) {
-              this.sendRes(id, "ASSIGN_RES", "E NO_DATA");
+              this.sendRes(id, "ASSIGN_RES", "E NO_KEY");
             }
-            Logging.warning("ASSIGN_RES " + id + " E NO_DATA");
+            Logging.warning("ASSIGN_RES " + id + " E NO_KEY");
+            return;
+          }
+          // m[4] is necessary as it contains value
+          if (!m[4]) {
+            if (res) {
+              this.sendRes(id, "ASSIGN_RES", "E NO_VALUE");
+            }
+            Logging.warning("ASSIGN_RES " + id + " E NO_VALUE");
             return;
           }
           // Execute Set command and return/log response.
-          ret = data.assign(m[2], m[3]);
+          ret = data.assign(m[2], m[3], m[4]);
           if (res) {
             this.sendRes(id, "ASSIGN_RES", ret);
           }
