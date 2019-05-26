@@ -170,7 +170,12 @@ export class SCData {
     return JSON.parse(text);
   }
   private POJOtoBase64(obj) {
-    const buff = Buffer.from(JSON.stringify(obj), "ascii");
+    const str = JSON.stringify(obj);
+    if (typeof str !== "string") {
+      Logging.error("Invalid object on POJOtoBase64");
+      return;
+    }
+    const buff = Buffer.from(str, "ascii");
     const b64 = buff.toString("base64");
     return b64;
   }
