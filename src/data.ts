@@ -117,22 +117,8 @@ export class SCData {
   }
   public dump(key) {
     const d = get(this.data, key);
-    const dump = [];
     Logging.debug("DUMP " + key);
-    if (d) {
-      const iterate = (obj, last = key) => {
-        Object.keys(obj).forEach((k) => {
-          if (typeof obj[k] === "object") {
-            const nlast = last + "." + k;
-            iterate(obj[k], nlast);
-          } else {
-            dump.push(last + "." + k + "=" + obj[k]);
-          }
-        });
-      };
-      iterate(d);
-    }
-    return dump;
+    return this.POJOtoBase64(d);
   }
   public save() {
     if (this.fileLoaded) {
@@ -182,5 +168,10 @@ export class SCData {
     const buff = Buffer.from(encoded, "base64");
     const text = buff.toString("ascii");
     return JSON.parse(text);
+  }
+  private POJOtoBase64(obj) {
+    const buff = Buffer.from(JSON.stringify(obj), "ascii");
+    const b64 = buff.toString("base64");
+    return b64;
   }
 }
