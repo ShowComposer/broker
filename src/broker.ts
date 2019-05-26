@@ -3,8 +3,8 @@
 const config = { port: 6789 };
 const subscriber = {};
 
-const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "DEL", "SUB", "UNSUB", "DUMP", "SMSG"];
-const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
+const sendTypes = ["INIT", "INIT_REUSE", "PING", "SET", "ASSIGN", "DEL", "SUB", "UNSUB", "DUMP", "SMSG"];
+const responseTypes = ["INIT_ACK", "PONG", "SET_RES", "ASSIGN_RES", "DEL_RES", "SUB_RES", "UNSUB_RES", "DUMP_RES"];
 const dataTypes = ["STATIC", "LIVE", "TICK", "LINK"];
 
 import * as net from "net";
@@ -128,9 +128,10 @@ class Client {
     }
     if (sendTypes.includes(m[1])) {
       // it's a req
+      let res = false;
+      let ret;
       switch (m[1]) {
         case "SET":
-          let res = false;
           if (m[4] === "1") { res = true; }
           // m[2] is data types
           if (!dataTypes.includes(m[2])) {
@@ -149,9 +150,33 @@ class Client {
             return;
           }
           // Execute Set command and return/log response.
-          const ret = data.set(m[2], m[3]);
+          ret = data.set(m[2], m[3]);
           if (res) {
             this.sendRes(id, "SET_RES", ret);
+          }
+          break;
+        case "ASSIGN":
+          if (m[4] === "1") { res = true; }
+          // m[2] is data types
+          if (!dataTypes.includes(m[2])) {
+            if (res) {
+              this.sendRes(id, "ASSIGN_RES", "E INVALID_TYPE");
+            }
+            Logging.warning("ASSIGN_RES " + id + " E INVALID_TYPE");
+            return;
+          }
+          // m[3] is necessary as it contains data
+          if (!m[3]) {
+            if (res) {
+              this.sendRes(id, "ASSIGN_RES", "E NO_DATA");
+            }
+            Logging.warning("ASSIGN_RES " + id + " E NO_DATA");
+            return;
+          }
+          // Execute Set command and return/log response.
+          ret = data.assign(m[2], m[3]);
+          if (res) {
+            this.sendRes(id, "ASSIGN_RES", ret);
           }
           break;
         case "SUB":
@@ -233,5 +258,5 @@ server.on("connection", (s) => {
 });
 server.listen(config.port, () => {
   Logging.log("Listening on port " + config.port);
-  process.send({status: "listening"});
+  process.send({ status: "listening" });
 });
