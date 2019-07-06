@@ -60,7 +60,7 @@ export class SCData {
         PubSub.publish(key, "SET TICK " + key + "=" + value);
         break;
     }
-    Logging.debug("SET " + key + " to " + value);
+    Logging.debug("SET " + key + " to " + value + " (" + type + ")");
     return "0";
   }
   public assign(type, key, value = "e30=") {
@@ -94,7 +94,7 @@ export class SCData {
         PubSub.publish(key, "ASSIGN TICK " + key + " " + value);
         break;
     }
-    Logging.debug("ASSIGN " + JSON.stringify(assObject) + " to " + key);
+    Logging.debug("ASSIGN " + JSON.stringify(assObject) + " to " + key + " (" + type + ")");
     return "0";
   }
   public sub(key, cb, t) {
