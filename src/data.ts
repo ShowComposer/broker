@@ -56,7 +56,8 @@ export class SCData {
         // ToDo
         break;
       case "TICK":
-
+        set(this.data, key, value);
+        PubSub.publish(key, "SET TICK " + key + "=" + value);
         break;
     }
     Logging.debug("SET " + key + " to " + value);
@@ -89,7 +90,8 @@ export class SCData {
         // ToDo
         break;
       case "TICK":
-
+        this.data = merge(this.data, deepAssObject);
+        PubSub.publish(key, "ASSIGN TICK " + key + " " + value);
         break;
     }
     Logging.debug("ASSIGN " + JSON.stringify(assObject) + " to " + key);
