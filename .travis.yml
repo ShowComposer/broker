@@ -17,4 +17,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    repo: ShowComposer/datalib
+    repo: ShowComposer/broker
