@@ -29,13 +29,13 @@
   },
   "homepage": "https://showcomposer.de",
   "devDependencies": {
-    "@types/node": "^10.14.4",
-    "nodemon": "^1.18.10",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4.2"
+    "@types/node": "^10.14.12",
+    "nodemon": "^1.19.1",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@hibas123/nodelogging": "^2.0.4",
+    "@hibas123/nodelogging": "^2.1.0",
     "big-json": "^2.0.2",
     "deep-for-each": "^3.0.0",
     "get-value": "^3.0.1",
