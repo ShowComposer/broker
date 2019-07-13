@@ -11,3 +11,9 @@ script:
 after_success:
 
 deploy:
+  provider: npm
+  email: "$NPM_MAIL"
+  api_key: "$NPM_TOKEN"
+  on:
+    tags: true
+    repo: ShowComposer/datalib
