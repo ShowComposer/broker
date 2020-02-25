@@ -49,8 +49,8 @@ class Client {
     subscriber[this.uuid] = this;
 
     // Initialize obj in data
-    data.set("LIVE", "system.connections." + this.uuid + ".state=UP");
-    data.set("LIVE", "system.connections." + this.uuid + ".time_established=" + Date.now());
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".state","UP");
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".time_established",Date.now());
 
     this.socket.setKeepAlive(true);
     this.socket.setNoDelay();
@@ -72,8 +72,8 @@ class Client {
         this.pingResponse = (process.hrtime.bigint() - start) / BigInt(1000);
         this.pingSuccess = Date.now();
         Logging.debug("Ping: " + this.pingResponse + "\xB5s");
-        data.set("LIVE", "system.connections." + this.uuid + ".latency=" + this.pingResponse);
-        data.set("LIVE", "system.connections." + this.uuid + ".last_ping=" + this.pingSuccess);
+        data.setPlain("LIVE", "system.connections." + this.uuid + ".latency", this.pingResponse);
+        data.setPlain("LIVE", "system.connections." + this.uuid + ".last_ping", this.pingSuccess);
       }
     });
   }
@@ -88,8 +88,8 @@ class Client {
     if (!this.socket.destroyed) {
       this.socket.destroy();
     }
-    data.set("LIVE", "system.connections." + this.uuid + ".state=CLOSED");
-    data.set("LIVE", "system.connections." + this.uuid + ".time_closed=" + Date.now());
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".state","CLOSED");
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".time_closed", Date.now());
   }
   public destroy() {
     // unsubscribe from all subscriptions
@@ -101,8 +101,8 @@ class Client {
     if (!this.socket.destroyed) {
       this.socket.destroy();
     }
-    data.set("LIVE", "system.connections." + this.uuid + ".state=DESTROYED");
-    data.set("LIVE", "system.connections." + this.uuid + ".time_closed=" + Date.now());
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".state","DESTROYED");
+    data.setPlain("LIVE", "system.connections." + this.uuid + ".time_closed", Date.now());
   }
   // Handle input
   public handleLine(c) {

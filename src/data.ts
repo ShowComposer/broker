@@ -31,19 +31,23 @@ export class SCData {
       }
     }, 5000);
   }
-  public set(type, cmd) {
+	public set(type, cmd) {
+		const p = cmd.split("=");
+		this.setPlain(type, cmd, this.base64toString(p[1]));
+	}
+
+  public setPlain(type, cmd, value : any = true) {
     const p = cmd.split("=");
     const key = p[0];
-    const value = p[1] || true;
     // Switch between different set-types
     switch (type) {
       case "LIVE":
         set(this.data, key, value);
-        PubSub.publish(key, "SET LIVE " + key + "=" + value);
+        PubSub.publish(key, "SET LIVE " + key + "=" + this.stringToBase64(value));
         break;
       case "STATIC":
         set(this.data, key, value);
-        PubSub.publish(key, "SET STATIC " + key + "=" + value);
+        PubSub.publish(key, "SET STATIC " + key + "=" + this.stringToBase64(value));
         set(this.static, key, value);
         // Save file if necessary and set flags
         this.staticChanged = true;
@@ -57,7 +61,7 @@ export class SCData {
         break;
       case "TICK":
         set(this.data, key, value);
-        PubSub.publish(key, "SET TICK " + key + "=" + value);
+        PubSub.publish(key, "SET TICK " + key + "=" + this.stringToBase64(value));
         break;
     }
     Logging.debug("SET " + key + " to " + value + " (" + type + ")");
@@ -173,9 +177,10 @@ export class SCData {
     }
 
   }
+	// Base 64 helper methods
   private base64toPOJO(encoded) {
     const buff = Buffer.from(encoded, "base64");
-    const text = buff.toString("ascii");
+    const text = buff.toString("utf8");
     return JSON.parse(text);
   }
   private POJOtoBase64(obj) {
@@ -184,8 +189,23 @@ export class SCData {
       Logging.error("Invalid object on POJOtoBase64");
       return;
     }
-    const buff = Buffer.from(str, "ascii");
+    const buff = Buffer.from(str, "utf8");
     const b64 = buff.toString("base64");
     return b64;
   }
+	private base64toString(encoded) {
+		const buff = Buffer.from(encoded, "base64");
+		return buff.toString("utf8");
+	}
+	private stringToBase64(str) {
+		if (typeof str !== "string") {
+			if(!(str = str.toString())) {
+				Logging.error("Invalid value on stringToBase64");
+				return;
+			}
+		}
+		const buff = Buffer.from(str, "utf8");
+		const b64 = buff.toString("base64");
+		return b64;
+	}
 }
