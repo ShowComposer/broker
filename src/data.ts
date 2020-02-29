@@ -32,22 +32,22 @@ export class SCData {
     }, 5000);
   }
 	public set(type, cmd) {
-		const p = cmd.split("=");
+		const p = cmd.split(":");
 		this.setPlain(type, cmd, this.base64toString(p[1]));
 	}
 
   public setPlain(type, cmd, value : any = true) {
-    const p = cmd.split("=");
+    const p = cmd.split(":");
     const key = p[0];
     // Switch between different set-types
     switch (type) {
       case "LIVE":
         set(this.data, key, value);
-        PubSub.publish(key, "SET LIVE " + key + "=" + this.stringToBase64(value));
+        PubSub.publish(key, "SET LIVE " + key + ":" + this.stringToBase64(value));
         break;
       case "STATIC":
         set(this.data, key, value);
-        PubSub.publish(key, "SET STATIC " + key + "=" + this.stringToBase64(value));
+        PubSub.publish(key, "SET STATIC " + key + ":" + this.stringToBase64(value));
         set(this.static, key, value);
         // Save file if necessary and set flags
         this.staticChanged = true;
@@ -61,7 +61,7 @@ export class SCData {
         break;
       case "TICK":
         set(this.data, key, value);
-        PubSub.publish(key, "SET TICK " + key + "=" + this.stringToBase64(value));
+        PubSub.publish(key, "SET TICK " + key + ":" + this.stringToBase64(value));
         break;
     }
     Logging.debug("SET " + key + " to " + value + " (" + type + ")");
@@ -162,7 +162,7 @@ export class SCData {
       parseStream.on("data", (pojo) => {
         deepForEach(pojo, (v, k, s, p) => {
           if (typeof v !== "object") {
-            this.set("STATIC", p + "=" + v);
+            this.setPlain("STATIC", p, v);
           }
 
         });
