@@ -41,7 +41,7 @@
     "get-value": "^3.0.1",
     "merge-deep": "^3.0.2",
     "pubsub-js": "^1.7.0",
-    "set-value": "^3.0.1",
+    "set-value": "^4.0.1",
     "uuid": "^3.3.2"
   }
 }
